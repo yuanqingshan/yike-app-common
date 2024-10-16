@@ -37,8 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -297,6 +299,10 @@ private fun MainView(
             }
         }
         if (!isShowedGuide1) {
+            var showIndex by remember {
+                mutableIntStateOf(value = 0)
+            }
+            val showComplete by rememberUpdatedState(newValue = showIndex >= 1)
             ConstraintLayout(
                 modifier = Modifier
                     .fillMaxSize()
@@ -310,58 +316,105 @@ private fun MainView(
                     .nothing(),
             ) {
                 val (
-                    tip1,
-                    line1,
+                    tip1, tip2,
+                    arrow1, arrow2,
                     textIKnow,
                 ) = createRefs()
-                Icon(
-                    modifier = Modifier
-                        .constrainAs(ref = line1) {
-                            this.end.linkTo(anchor = parent.end, margin = 30.dp)
-                            this.bottom.linkTo(
-                                anchor = parent.bottom,
-                                margin = 160.dp,
-                            )
-                        }
-                        .rotate(degrees = 190f)
-                        .size(size = 100.dp)
-                        .nothing(),
-                    painter = painterResource(
-                        id = com.xiaojinzi.tally.lib.res.R.drawable.res_guide_line1,
-                    ),
-                    contentDescription = null,
-                    tint = Color.White.copy(
-                        alpha = 0.8f,
-                    ),
-                )
-                Text(
-                    modifier = Modifier
-                        .constrainAs(ref = tip1) {
-                            this.bottom.linkTo(
-                                anchor = line1.top,
-                                margin = 24.dp,
-                            )
-                            this.start.linkTo(anchor = parent.start, margin = 0.dp)
-                            this.end.linkTo(anchor = parent.end, margin = 0.dp)
-                        }
-                        .wrapContentSize()
-                        .nothing(),
-                    text = "长按可进入普通或者 AI 记账\n设置中可配置优先的记账方式",
-                    fontFamily = FontFamily(Font(com.xiaojinzi.tally.lib.res.R.font.res_font_xdks)),
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = Color.White.copy(
+                if (showIndex == 0) {
+                    Icon(
+                        modifier = Modifier
+                            .constrainAs(ref = arrow1) {
+                                this.end.linkTo(anchor = parent.end, margin = 30.dp)
+                                this.bottom.linkTo(
+                                    anchor = parent.bottom,
+                                    margin = 160.dp,
+                                )
+                            }
+                            .rotate(degrees = 190f)
+                            .size(size = 100.dp)
+                            .nothing(),
+                        painter = painterResource(
+                            id = com.xiaojinzi.tally.lib.res.R.drawable.res_guide_line1,
+                        ),
+                        contentDescription = null,
+                        tint = Color.White.copy(
                             alpha = 0.8f,
                         ),
-                    ),
-                    textAlign = TextAlign.Center,
-                )
+                    )
+                    Text(
+                        modifier = Modifier
+                            .constrainAs(ref = tip1) {
+                                this.bottom.linkTo(
+                                    anchor = arrow1.top,
+                                    margin = 24.dp,
+                                )
+                                this.start.linkTo(anchor = parent.start, margin = 0.dp)
+                                this.end.linkTo(anchor = parent.end, margin = 0.dp)
+                            }
+                            .wrapContentSize()
+                            .nothing(),
+                        text = "长按可进入普通或者 AI 记账\n设置中可配置优先的记账方式",
+                        fontFamily = FontFamily(Font(com.xiaojinzi.tally.lib.res.R.font.res_font_xdks)),
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color.White.copy(
+                                alpha = 0.8f,
+                            ),
+                        ),
+                        textAlign = TextAlign.Center,
+                    )
+                } else if (showIndex == 1) {
+                    Icon(
+                        modifier = Modifier
+                            .constrainAs(ref = arrow2) {
+                                this.start.linkTo(anchor = parent.start, margin = 0.dp)
+                                this.end.linkTo(anchor = parent.end, margin = 0.dp)
+                                this.top.linkTo(
+                                    anchor = parent.top,
+                                    margin = 260.dp,
+                                )
+                            }
+                            .rotate(degrees = 45f)
+                            .size(size = 100.dp)
+                            .nothing(),
+                        painter = painterResource(
+                            id = com.xiaojinzi.tally.lib.res.R.drawable.res_guide_line1,
+                        ),
+                        contentDescription = null,
+                        tint = Color.White.copy(
+                            alpha = 0.8f,
+                        ),
+                    )
+                    Text(
+                        modifier = Modifier
+                            .constrainAs(ref = tip2) {
+                                this.top.linkTo(
+                                    anchor = arrow2.bottom,
+                                    margin = 44.dp,
+                                )
+                                this.start.linkTo(anchor = parent.start, margin = 0.dp)
+                                this.end.linkTo(anchor = parent.end, margin = 0.dp)
+                            }
+                            .wrapContentSize()
+                            .nothing(),
+                        text = "卡片左右滑动可切换月份\n点击时间可选择月份",
+                        fontFamily = FontFamily(Font(com.xiaojinzi.tally.lib.res.R.font.res_font_xdks)),
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color.White.copy(
+                                alpha = 0.8f,
+                            ),
+                        ),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+
                 Text(
                     modifier = Modifier
                         .constrainAs(ref = textIKnow) {
                             this.bottom.linkTo(
                                 anchor = parent.bottom,
-                                margin = 48.dp,
+                                margin = 88.dp,
                             )
                             this.start.linkTo(anchor = parent.start, margin = 0.dp)
                             this.end.linkTo(anchor = parent.end, margin = 0.dp)
@@ -375,13 +428,21 @@ private fun MainView(
                         )
                         .wrapContentSize()
                         .clickable {
-                            AppServices
-                                .appConfigSpi
-                                .switchShowedGuide1(b = true)
+                            if (showComplete) {
+                                AppServices
+                                    .appConfigSpi
+                                    .switchShowedGuide1(b = true)
+                            } else {
+                                showIndex++
+                            }
                         }
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                         .nothing(),
-                    text = "我知道了",
+                    text = if (showComplete) {
+                        "我知道了"
+                    } else {
+                        "下一步"
+                    },
                     fontFamily = FontFamily(Font(com.xiaojinzi.tally.lib.res.R.font.res_font_xdks)),
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.bodyMedium.copy(

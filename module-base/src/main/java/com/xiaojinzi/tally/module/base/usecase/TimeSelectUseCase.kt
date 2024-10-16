@@ -9,9 +9,8 @@ import com.xiaojinzi.reactive.template.domain.BusinessUseCase
 import com.xiaojinzi.reactive.template.domain.BusinessUseCaseImpl
 import com.xiaojinzi.reactive.template.domain.CommonUseCase
 import com.xiaojinzi.reactive.template.domain.CommonUseCaseImpl
-import com.xiaojinzi.support.annotation.StateHotObservable
+import com.xiaojinzi.support.ktx.HotStateFlow
 import com.xiaojinzi.support.ktx.MutableSharedStateFlow
-import com.xiaojinzi.support.ktx.commonTimeFormat2
 import com.xiaojinzi.support.ktx.commonTimeFormat3
 import com.xiaojinzi.support.ktx.getDayOfMonth
 import com.xiaojinzi.support.ktx.getMonthByTimeStamp
@@ -19,7 +18,6 @@ import com.xiaojinzi.support.ktx.getYearByTimeStamp
 import com.xiaojinzi.support.ktx.toStringItemDto
 import com.xiaojinzi.tally.lib.res.model.support.DateTimeType
 import com.xiaojinzi.tally.module.base.support.AppRouterBaseApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Calendar
@@ -27,6 +25,7 @@ import java.util.Calendar
 interface TimeSelectUseCase : BusinessUseCase {
 
     sealed class Intent {
+
         data class DateTimeSelect(
             @UiContext val context: Context,
             val dateTimeType: DateTimeType,
@@ -37,29 +36,36 @@ interface TimeSelectUseCase : BusinessUseCase {
             val month: Int,
         ) : Intent()
 
+        /**
+         * value 可以为负数
+         * 每次调用会产生一个偏移
+         */
         data class YearAdjust(
             val value: Int,
         ) : Intent()
 
+        /**
+         * value 可以为负数
+         * 每次调用会产生一个偏移
+         */
         data class MonthAdjust(
             val value: Int,
         ) : Intent()
 
+        /**
+         * 重置时间
+         */
         data object ResetTime : Intent()
 
     }
 
-    @StateHotObservable
-    val currentTimeStateOb: Flow<Long>
+    val currentTimeStateOb: HotStateFlow<Long>
 
-    @StateHotObservable
-    val selectedYearStateOb: Flow<Int>
+    val selectedYearStateOb: HotStateFlow<Int>
 
-    @StateHotObservable
-    val selectedMonthStateOb: Flow<Int>
+    val selectedMonthStateOb: HotStateFlow<Int>
 
-    @StateHotObservable
-    val selectedDayOfMonthStateOb: Flow<Int>
+    val selectedDayOfMonthStateOb: HotStateFlow<Int>
 
 }
 
