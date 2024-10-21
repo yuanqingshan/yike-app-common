@@ -32,6 +32,7 @@ class BookInfoViewModel(
         bookList.map { item ->
             val queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
                 bookIdList = listOf(item.id),
+                isNotCalculate = false,
             )
             BookInfoItemVo(
                 bookId = item.id,

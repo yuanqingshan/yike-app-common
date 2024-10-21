@@ -75,11 +75,6 @@ fun AppTheme(
                     content = content,
                 )
 
-                THEME_NAME_OLIVE_GREEN -> OliveGreenAppTheme(
-                    useDarkTheme = useDarkThemeAdapter,
-                    content = content,
-                )
-
                 THEME_NAME_SCHENBRUNN_YELLOW -> SchenbrunnYellowAppTheme(
                     useDarkTheme = useDarkThemeAdapter,
                     content = content,
@@ -96,6 +91,11 @@ fun AppTheme(
                 )
 
                 THEME_NAME_FOLLOW_SYSTEM -> OliveGreenDynamicAppTheme(
+                    useDarkTheme = useDarkThemeAdapter,
+                    content = content,
+                )
+
+                THEME_NAME_OLIVE_GREEN -> OliveGreenAppTheme(
                     useDarkTheme = useDarkThemeAdapter,
                     content = content,
                 )

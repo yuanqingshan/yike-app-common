@@ -569,6 +569,7 @@ class StatisticsUseCaseImpl(
                                     StatisticsUseCase.StatisticsType.Spending -> true
                                     else -> null
                                 },
+                                isNotCalculate = false,
                             ),
                         )
                 }
@@ -686,6 +687,7 @@ class StatisticsUseCaseImpl(
                                                     StatisticsUseCase.StatisticsType.Spending -> true
                                                     else -> null
                                                 },
+                                                isNotCalculate = false,
                                             ),
                                         )
                                 }

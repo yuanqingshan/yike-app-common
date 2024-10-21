@@ -43,6 +43,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,6 +65,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -95,6 +97,7 @@ import com.xiaojinzi.support.ktx.nothing
 import com.xiaojinzi.support.ktx.orNull
 import com.xiaojinzi.support.ktx.shake
 import com.xiaojinzi.support.ktx.tryFinishActivity
+import com.xiaojinzi.support.ktx.tryToggle
 import com.xiaojinzi.tally.lib.res.R
 import com.xiaojinzi.tally.lib.res.model.support.rememberPainter
 import com.xiaojinzi.tally.lib.res.model.tally.TallyCategoryDto
@@ -422,11 +425,12 @@ private fun BillCrudCoreView(
         initial = null
     )
     val labelList by vm.labelInfoListStateOb.collectAsState(initial = emptyList())
-    val timeStampStr by vm.timeStampStrStateOb.collectAsState(initial = null)
+    val timeStampStr by vm.timeStampStrState.collectAsState(initial = null)
     val account by vm.accountStateOb.collectAsState(initial = null)
     val transferAccount by vm.transferAccountStateOb.collectAsState(initial = null)
     val transferTargetAccount by vm.transferTargetAccountStateOb.collectAsState(initial = null)
-    val imageUrlList by vm.imageUrlListStateOb.collectAsState(initial = emptyList())
+    val imageUrlList by vm.imageUrlListState.collectAsState(initial = emptyList())
+    val isNotCalculate by vm.isNotCalculateState.collectAsState(initial = false)
 
     val subSpendingCategoryList = categorySpendingMap[categoryGroupSelected]
     val subIncomeCategoryList = categoryIncomeMap[categoryGroupSelected]
@@ -578,79 +582,61 @@ private fun BillCrudCoreView(
                         tint = MaterialTheme.colorScheme.onBackground,
                     )
                 }
-                if (isForRefund) {
-                    Text(
-                        modifier = Modifier
-                            .weight(weight = 1f, fill = true)
-                            .wrapContentHeight()
-                            .nothing(),
-                        text = "(退款) ${
-                            refundBillDetail?.run {
-                                this.category?.name.orEmpty()
-                            } ?: categoryItemSelected?.run {
-                                this.name?.contentWithComposable()
-                            } ?: categoryGroupSelected?.name?.contentWithComposable().orEmpty()
-                        }",
-                        style = MaterialTheme.typography.titleSmall,
-                        textAlign = TextAlign.Center,
-                    )
-                } else {
-                    TabRow(
-                        modifier = Modifier
-                            .weight(weight = 1f, fill = true)
-                            .wrapContentHeight()
-                            .nothing(),
-                        selectedTabIndex = 0,
-                        indicator = @Composable { tabPositions ->
-                            if (categoryPageState.currentPage < tabPositions.size) {
-                                TabRowDefaults.Indicator(
-                                    modifier = Modifier
-                                        .tabIndicatorOffset(tabPositions[categoryPageState.currentPage])
-                                        .width(16.dp)
-                                        .requiredWidth(16.dp)
-                                        .nothing()
-                                )
-                            }
-                        },
-                        divider = {
-                        },
-                    ) {
-                        tabList.forEach { item ->
-                            val isSelected = currentSelectTab == item
-                            Tab(
-                                selected = isSelected,
-                                interactionSource = NoInteractionSource,
-                                onClick = {
-                                    scope.launchIgnoreError {
-                                        categoryPageState.animateScrollToPage(
-                                            page = tabList.indexOf(element = item).coerceIn(
-                                                minimumValue = 0,
-                                                maximumValue = tabList.size - 1,
-                                            ),
-                                        )
-                                    }
+                TabRow(
+                    modifier = Modifier
+                        .weight(weight = 1f, fill = true)
+                        .wrapContentHeight()
+                        .nothing(),
+                    selectedTabIndex = 0,
+                    indicator = @Composable { tabPositions ->
+                        if (categoryPageState.currentPage < tabPositions.size) {
+                            TabRowDefaults.Indicator(
+                                modifier = Modifier
+                                    .tabIndicatorOffset(tabPositions[categoryPageState.currentPage])
+                                    .width(16.dp)
+                                    .requiredWidth(16.dp)
+                                    .nothing()
+                            )
+                        }
+                    },
+                    divider = {
+                    },
+                ) {
+                    tabList.forEach { item ->
+                        val isSelected = currentSelectTab == item
+                        Tab(
+                            selected = isSelected,
+                            interactionSource = NoInteractionSource,
+                            onClick = {
+                                scope.launchIgnoreError {
+                                    categoryPageState.animateScrollToPage(
+                                        page = tabList.indexOf(element = item).coerceIn(
+                                            minimumValue = 0,
+                                            maximumValue = tabList.size - 1,
+                                        ),
+                                    )
+                                }
+                            },
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(bottom = APP_PADDING_SMALL.dp)
+                                    .nothing(),
+                                text = when (item) {
+                                    BillCrudTab.Spending -> "支出"
+                                    BillCrudTab.Income -> "收入"
+                                    BillCrudTab.Transfer -> "转账"
+                                    else -> notSupportError()
                                 },
-                            ) {
-                                Text(
-                                    modifier = Modifier
-                                        .padding(bottom = APP_PADDING_SMALL.dp)
-                                        .nothing(),
-                                    text = when (item) {
-                                        BillCrudTab.Spending -> "支出"
-                                        BillCrudTab.Income -> "收入"
-                                        BillCrudTab.Transfer -> "转账"
-                                        else -> notSupportError()
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    color = if (isSelected) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.inversePrimary
                                     },
-                                    textAlign = TextAlign.Start,
-                                    style = MaterialTheme.typography.titleSmall.copy(
-                                        color = if (isSelected) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            MaterialTheme.colorScheme.inversePrimary
-                                        },
-                                    ),
-                                )
-                            }
+                                ),
+                            )
                         }
                     }
                 }
@@ -1054,7 +1040,7 @@ private fun BillCrudCoreView(
                     .padding(horizontal = 5.dp, vertical = 4.dp)
                     .size(size = 18.dp)
                     .nothing(),
-                painter = painterResource(id = com.xiaojinzi.tally.lib.res.R.drawable.res_label2),
+                painter = painterResource(id = R.drawable.res_label2),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface,
             )
@@ -1242,7 +1228,7 @@ private fun BillCrudCoreView(
                             }
                             .padding(
                                 horizontal = 0.dp,
-                                vertical = APP_PADDING_NORMAL.dp
+                                vertical = 0.dp
                             )
                             .nothing(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -1254,7 +1240,7 @@ private fun BillCrudCoreView(
                             modifier = Modifier
                                 .size(size = 16.dp)
                                 .nothing(),
-                            painter = painterResource(id = com.xiaojinzi.tally.lib.res.R.drawable.res_image1),
+                            painter = painterResource(id = R.drawable.res_image1),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
@@ -1301,7 +1287,39 @@ private fun BillCrudCoreView(
                                 )
                             }
                         }
+                    }
 
+                    // 不计入预算
+                    Row(
+                        modifier = Modifier
+                            .offset(x = (-4).dp)
+                            .wrapContentSize()
+                            .clickableNoRipple {
+                                vm.isNotCalculateState.tryToggle()
+                            }
+                            .nothing(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .scale(0.8f)
+                                .nothing(),
+                            checked = isNotCalculate,
+                            onCheckedChange = {
+                                vm.isNotCalculateState.tryToggle()
+                            },
+                        )
+                        Text(
+                            modifier = Modifier
+                                .offset(x = (-8).dp)
+                                .wrapContentSize()
+                                .nothing(),
+                            text = "不计入收支",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                            ),
+                        )
                     }
 
                 }

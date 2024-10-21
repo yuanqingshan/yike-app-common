@@ -243,17 +243,22 @@ interface BillCrudUseCase : BusinessUseCase {
     /**
      * 时间戳
      */
-    val timeStampStateOb: HotStateFlow<Long?>
+    val timeStampState: HotStateFlow<Long?>
 
     /**
      * 时间戳的字符串
      */
-    val timeStampStrStateOb: HotStateFlow<String?>
+    val timeStampStrState: HotStateFlow<String?>
 
     /**
      * 图片地址列表
      */
-    val imageUrlListStateOb: HotStateFlow<List<String>>
+    val imageUrlListState: HotStateFlow<List<String>>
+
+    /**
+     * 是否不参与计算
+     */
+    val isNotCalculateState: MutableSharedStateFlow<Boolean>
 
     /**
      * 是否可以切换账本
@@ -379,15 +384,15 @@ class BillCrudUseCaseImpl(
         initValue = "",
     )
 
-    override val timeStampStateOb = MutableSharedStateFlow<Long?>(
+    override val timeStampState = MutableSharedStateFlow<Long?>(
         initValue = null,
     )
 
-    override val timeStampStrStateOb = combine(
+    override val timeStampStrState = combine(
         AppServices
             .appConfigSpi
             .isShowHourAndMinuteWhenBillCrudStateOb,
-        timeStampStateOb,
+        timeStampState,
     ) { isShowHourAndMinuteWhenBillCrud, timeStamp ->
         timeStamp?.let { timeStamp1 ->
             SimpleDateFormat(
@@ -405,8 +410,12 @@ class BillCrudUseCaseImpl(
         scope = scope,
     )
 
-    override val imageUrlListStateOb = MutableSharedStateFlow<List<String>>(
+    override val imageUrlListState = MutableSharedStateFlow<List<String>>(
         initValue = emptyList(),
+    )
+
+    override val isNotCalculateState = MutableSharedStateFlow(
+        initValue = false,
     )
 
     override val canSwitchBookState = combine(
@@ -447,15 +456,18 @@ class BillCrudUseCaseImpl(
             value = null,
         )
         if (resetType == ResetType.All) {
-            imageUrlListStateOb.emit(
+            imageUrlListState.emit(
                 value = emptyList(),
             )
             costUseCase.resetAction().await()
-            timeStampStateOb.emit(
+            timeStampState.emit(
                 value = null,
             )
             noteStateOb.emit(
                 value = "",
+            )
+            isNotCalculateState.emit(
+                value = false,
             )
         }
     }
@@ -550,10 +562,10 @@ class BillCrudUseCaseImpl(
             labelIdListStateOb.emit(
                 value = intent.labelIdSet,
             )
-            imageUrlListStateOb.emit(
+            imageUrlListState.emit(
                 value = intent.imageUrlList,
             )
-            timeStampStateOb.emit(
+            timeStampState.emit(
                 value = intent.time,
             )
             if (associatedRefundBillInfo == null) {
@@ -717,16 +729,19 @@ class BillCrudUseCaseImpl(
                     labelIdListStateOb.emit(
                         value = targetBillDetail.labelList.map { it.id }.toSet(),
                     )
-                    timeStampStateOb.emit(
+                    timeStampState.emit(
                         value = targetBillDetail.core.time,
                     )
-                    imageUrlListStateOb.emit(
+                    imageUrlListState.emit(
                         value = billImageList.map {
                             it.url.orEmpty()
                         }
                     )
                     noteStateOb.emit(
                         value = targetBillDetail.core.note.orEmpty(),
+                    )
+                    isNotCalculateState.emit(
+                        value = targetBillDetail.core.isNotCalculate,
                     )
                     costUseCase.costAppend(
                         target = amount.value.run {
@@ -921,8 +936,8 @@ class BillCrudUseCaseImpl(
         val originBillIdFinal = refundBillInfo?.core?.id ?: editBillDetailInfo?.core?.originBillId
 
         val targetLabelIdList = labelInfoListStateOb.first().map { it.id }
-        val targetImageUrlList = imageUrlListStateOb.first()
-        val targetTime = timeStampStateOb.firstOrNull() ?: System.currentTimeMillis()
+        val targetImageUrlList = imageUrlListState.first()
+        val targetTime = timeStampState.firstOrNull() ?: System.currentTimeMillis()
         val note = noteStateOb.first()
 
         // 计算金额
@@ -950,6 +965,7 @@ class BillCrudUseCaseImpl(
                 1
             },
         )
+        val isNotCalculate = isNotCalculateState.first()
         if (editBillDetailInfo == null) {
             // 插入一个账单
             AppServices
@@ -966,6 +982,7 @@ class BillCrudUseCaseImpl(
                         note = note,
                         time = targetTime,
                         amount = amountFinal,
+                        isNotCalculate = isNotCalculate,
                     ),
                     labelIdList = targetLabelIdList,
                     imageUrlList = targetImageUrlList,
@@ -988,6 +1005,7 @@ class BillCrudUseCaseImpl(
                                 note = note,
                                 time = targetTime,
                                 amount = amountFinal,
+                                isNotCalculate = isNotCalculate,
                             ),
                             labelIdList = targetLabelIdList,
                             imageUrlList = targetImageUrlList,
@@ -1123,13 +1141,13 @@ class BillCrudUseCaseImpl(
             .appConfigSpi
             .isShowHourAndMinuteWhenBillCrudStateOb
             .first()
-        timeStampStateOb.emit(
+        timeStampState.emit(
             value = ParameterSupport.getLong(
                 intent = AppRouterBaseApi::class
                     .routeApi()
                     .dateTimeSelectBySuspend(
                         context = intent.context,
-                        time = timeStampStateOb.firstOrNull(),
+                        time = timeStampState.firstOrNull(),
                         type = if (isShowHourAndMinuteWhenBillCrud) {
                             DateTimeType.Time
                         } else {
@@ -1220,7 +1238,7 @@ class BillCrudUseCaseImpl(
                 .billImageCrudBySuspend(
                     context = intent.context,
                     imageUrlList = ArrayList(
-                        imageUrlListStateOb.first(),
+                        imageUrlListState.first(),
                     ),
                 ),
             key = "data",
@@ -1229,7 +1247,7 @@ class BillCrudUseCaseImpl(
             tag = BillCrudUseCase.TAG,
             content = "urlList = ${urlList.joinToString()}",
         )
-        imageUrlListStateOb.emit(
+        imageUrlListState.emit(
             value = urlList,
         )
     }

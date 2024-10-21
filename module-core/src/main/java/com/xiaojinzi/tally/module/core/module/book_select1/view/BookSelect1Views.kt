@@ -278,7 +278,9 @@ private fun BookSelect1View(
 @Composable
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun BookSelect1ViewWrap() {
-    BottomView {
+    BottomView(
+        maxFraction = 0.7f,
+    ) {
         BookSelect1View()
     }
 }

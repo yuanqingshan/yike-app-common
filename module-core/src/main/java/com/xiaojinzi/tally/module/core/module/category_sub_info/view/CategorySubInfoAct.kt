@@ -2,6 +2,7 @@ package com.xiaojinzi.tally.module.core.module.category_sub_info.view
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,7 +14,6 @@ import com.xiaojinzi.support.activity_stack.ActivityFlag
 import com.xiaojinzi.support.annotation.ViewLayer
 import com.xiaojinzi.support.compose.StateBar
 import com.xiaojinzi.support.ktx.initOnceUseViewModel
-import com.xiaojinzi.support.ktx.translateStatusBar
 import com.xiaojinzi.tally.lib.res.ui.APP_ACTIVITY_FLAG_SYNC_SKIP
 import com.xiaojinzi.tally.module.base.support.AppRouterConfig
 import com.xiaojinzi.tally.module.base.support.alphaOutWhenFinish
@@ -52,7 +52,7 @@ class CategorySubInfoAct : BaseBusinessAct<CategorySubInfoViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.translateStatusBar()
+        enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         initOnceUseViewModel {

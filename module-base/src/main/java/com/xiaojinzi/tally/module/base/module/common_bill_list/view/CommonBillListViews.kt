@@ -281,6 +281,18 @@ private fun CommonBillListNormalItemView(
                         textAlign = TextAlign.Start,
                     )
                 }
+                if (normalItem?.isNotCalculate == true) {
+                    Text(
+                        modifier = Modifier
+                            .padding(start = APP_PADDING_SMALL.dp)
+                            .nothing(),
+                        text = "(不计入收支)",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.error,
+                        ),
+                        textAlign = TextAlign.Start,
+                    )
+                }
             }
             normalItem?.userName?.let { userName ->
                 Spacer(
@@ -643,7 +655,7 @@ private fun CommonBillListNormalItemViewPreview() {
             )
             .padding(
                 horizontal = APP_PADDING_NORMAL.dp,
-                vertical = APP_PADDING_NORMAL.dp
+                vertical = APP_PADDING_NORMAL.dp,
             )
             .nothing(),
         normalItem = CommonBillListNormalItemVo(
@@ -660,6 +672,7 @@ private fun CommonBillListNormalItemViewPreview() {
             transferTargetAccountName = "微信".toStringItemDto(),
             labelNameList = listOf("测试1", "测试2"),
             amount = 100f,
+            isNotCalculate = true,
         ),
     )
 }

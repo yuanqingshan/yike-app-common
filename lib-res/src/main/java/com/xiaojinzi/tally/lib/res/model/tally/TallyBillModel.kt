@@ -66,7 +66,7 @@ data class TallyBillInsertDto(
     val amount: MoneyFen,
     // 备注
     val note: String? = null,
-    // 不计入收支o
+    // 不计入收支, 默认 false
     val isNotCalculate: Boolean = false,
     val timeCreate: Long = System.currentTimeMillis(),
     val timeModify: Long? = null,

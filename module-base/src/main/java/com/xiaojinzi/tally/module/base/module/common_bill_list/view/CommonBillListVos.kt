@@ -38,6 +38,7 @@ data class CommonBillListNormalItemVo(
     val transferTargetAccountName: StringItemDto?,
     val labelNameList: List<String>,
     val amount: Float,
+    val isNotCalculate: Boolean,
 ) : CommonBillListItemVo()
 
 @Keep
@@ -66,6 +67,7 @@ fun TallyBillDetailDto.toCommonBillListNormalItemVo(
             TallyBillDto.Type.TRANSFER -> this.core.amount.toYuan().value.absoluteValue
             else -> this.core.amount.toYuan().value
         },
+        isNotCalculate = this.core.isNotCalculate,
     )
 }
 

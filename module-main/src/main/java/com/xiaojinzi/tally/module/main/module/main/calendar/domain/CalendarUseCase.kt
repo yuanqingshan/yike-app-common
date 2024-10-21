@@ -172,6 +172,7 @@ class CalendarUseCaseImpl(
                                 bookIdList = listOf(bookSelected.id),
                                 startTimeInclude = startTime,
                                 endTimeInclude = endTime,
+                                isNotCalculate = false,
                             ),
                         )
                 }

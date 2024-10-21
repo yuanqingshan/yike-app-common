@@ -2,6 +2,7 @@ package com.xiaojinzi.tally.module.main.module.app_update.view
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,7 +12,6 @@ import com.xiaojinzi.component.anno.RouterAnno
 import com.xiaojinzi.support.annotation.ViewLayer
 import com.xiaojinzi.support.compose.StateBar
 import com.xiaojinzi.support.ktx.initOnceUseViewModel
-import com.xiaojinzi.support.ktx.translateStatusBar
 import com.xiaojinzi.tally.lib.res.model.app_update.AppUpdateResDto
 import com.xiaojinzi.tally.module.base.support.AppRouterConfig
 import com.xiaojinzi.tally.module.base.theme.AppTheme
@@ -43,7 +43,7 @@ class AppUpdateAct : BaseBusinessAct<AppUpdateViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.translateStatusBar()
+        enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         initOnceUseViewModel {

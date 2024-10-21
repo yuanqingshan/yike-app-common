@@ -135,7 +135,7 @@ class ThemeSelectViewModel(
                     ThemeNormalSelectItemVo(
                         name = "橄榄绿",
                         themeName = THEME_NAME_OLIVE_GREEN,
-                        isSelected = themeName == THEME_NAME_OLIVE_GREEN,
+                        isSelected = themeName.isEmpty() || themeName == THEME_NAME_OLIVE_GREEN,
                         lightPrimary = OliveGreen_md_theme_light_primary,
                         lightPrimaryContainer = OliveGreen_md_theme_light_primaryContainer,
                         darkPrimary = OliveGreen_md_theme_dark_primary,
