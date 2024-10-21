@@ -68,7 +68,11 @@ interface TallyDataSourceSpi {
             val businessLogKey: String? = null,
             // 一般是一些多对多的时候用的, 比如要显示某个标签下的账单
             val idList: List<String> = emptyList(),
-            val typeList: List<TallyBillDto.Type> = emptyList(),
+            // 默认查询支持统计的账单类别
+            val typeList: List<TallyBillDto.Type> = listOf(
+                TallyBillDto.Type.NORMAL,
+                TallyBillDto.Type.REFUND,
+            ),
             val userIdList: List<String> = emptyList(),
             val bookIdList: List<String> = emptyList(),
             val categoryIdList: List<String> = emptyList(),
@@ -84,6 +88,7 @@ interface TallyDataSourceSpi {
             val amountMin: Long? = null,
             val amountMax: Long? = null,
             val pageInfo: PageInfo? = null,
+            val isNotCalculate: Boolean? = null,
             val isDeleted: Boolean? = false,
         ) : Parcelable
 
@@ -371,6 +376,9 @@ interface TallyDataSourceSpi {
      * -. 日消费和收入
      * -. 月消费和收入
      * -. 年消费和收入
+     * 支持的账单类型：
+     * [TallyBillDto.Type.NORMAL]
+     * [TallyBillDto.Type.REFUND]
      */
     fun subscribeBillAmountByCondition(
         queryCondition: BillQueryConditionDto = BillQueryConditionDto(),

@@ -50,13 +50,11 @@ object TallyStatisticsHelper {
             .tallyDataSourceSpi
             .subscribeBillAmountByCondition(
                 queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
-                    typeList = listOf(
-                        TallyBillDto.Type.NORMAL,
-                    ),
                     bookIdList = bookIdList,
                     startTimeInclude = startTime,
                     endTimeInclude = endTime - 1,
                     amountMoreThanZero = true,
+                    isNotCalculate = false,
                 )
             )
     }
@@ -89,13 +87,11 @@ object TallyStatisticsHelper {
             .tallyDataSourceSpi
             .subscribeBillAmountByCondition(
                 queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
-                    typeList = listOf(
-                        TallyBillDto.Type.NORMAL,
-                    ),
                     bookIdList = bookIdList,
                     startTimeInclude = startTime,
                     endTimeInclude = endTime - 1,
                     amountLessThanZero = true,
+                    isNotCalculate = false,
                 )
             )
     }

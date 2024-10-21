@@ -28,7 +28,6 @@ import com.xiaojinzi.tally.lib.res.model.support.LocalImageItemDto
 import com.xiaojinzi.tally.lib.res.model.support.toLocalImageItemDto
 import com.xiaojinzi.tally.lib.res.model.tally.MoneyFen
 import com.xiaojinzi.tally.lib.res.model.tally.MoneyYuan
-import com.xiaojinzi.tally.lib.res.model.tally.TallyBillDto
 import com.xiaojinzi.tally.lib.res.model.tally.TallyTable
 import com.xiaojinzi.tally.module.base.spi.TallyDataSourceSpi
 import com.xiaojinzi.tally.module.base.support.AppRouterCoreApi
@@ -305,9 +304,6 @@ class StatisticsUseCaseImpl(
                             ),
                             startTimeInclude = timePair.first,
                             endTimeInclude = timePair.second,
-                            typeList = listOf(
-                                TallyBillDto.Type.NORMAL,
-                            ),
                             amountMoreThanZero = when (type) {
                                 StatisticsUseCase.StatisticsType.Income -> true
                                 else -> null
@@ -316,6 +312,7 @@ class StatisticsUseCaseImpl(
                                 StatisticsUseCase.StatisticsType.Spending -> true
                                 else -> null
                             },
+                            isNotCalculate = false,
                         ),
                     ).transform { it.absoluteValue }.toYuan()
             }
@@ -426,7 +423,6 @@ class StatisticsUseCaseImpl(
                             .tallyDataSourceSpi
                             .getBillAmountByCondition(
                                 queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
-                                    typeList = listOf(TallyBillDto.Type.NORMAL),
                                     bookIdList = listOf(selectedBook.id),
                                     startTimeInclude = timeRange.first,
                                     endTimeInclude = timeRange.second,
@@ -463,7 +459,7 @@ class StatisticsUseCaseImpl(
         when (timeType) {
             StatisticsUseCase.TimeType.Year -> {
                 (1..12).map {
-                    if(it < 10) {
+                    if (it < 10) {
                         "0$it"
                     } else {
                         it.toString()
@@ -482,7 +478,7 @@ class StatisticsUseCaseImpl(
                         it == dayCountOfThisMonth || it % 3 == 1
                     }
                     .map {
-                        if(it < 10) {
+                        if (it < 10) {
                             "0$it"
                         } else {
                             it.toString()
@@ -562,9 +558,6 @@ class StatisticsUseCaseImpl(
                         .tallyDataSourceSpi
                         .getBillAmountByCondition(
                             queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
-                                typeList = listOf(
-                                    TallyBillDto.Type.NORMAL,
-                                ),
                                 startTimeInclude = timePair.first,
                                 endTimeInclude = timePair.second,
                                 categoryIdList = categoryList.map { it.id },
@@ -683,9 +676,6 @@ class StatisticsUseCaseImpl(
                                         .getBillAmountByCondition(
                                             queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
                                                 idList = billIdList,
-                                                typeList = listOf(
-                                                    TallyBillDto.Type.NORMAL,
-                                                ),
                                                 startTimeInclude = timePair.first,
                                                 endTimeInclude = timePair.second,
                                                 amountMoreThanZero = when (type) {

@@ -358,139 +358,154 @@ class SupportBillDetailPageQueryImpl(
             /*sb.append(" LEFT JOIN ${BillLabelDao.TableName} bl on bl.billId = b.id and bl.isDeleted = 0")
             sb.append(" LEFT JOIN ${LabelDao.TableName} l on l.id = bl.labelId and l.isDeleted = 0")*/
 
-            sb.append(" where")
 
-            // 添加条件
-            queryCondition.isDeleted?.let {
-                sb.append(" b.isDeleted = ${it.toOneOrZero()}")
-            }
-            queryCondition.searchQueryInfo?.let { searchQueryInfo ->
-                val searchQuerySqlList = mutableListOf<String>()
-                searchQueryInfo.billIdList?.let { searchBillIdList ->
-                    val billIdListCondition = searchBillIdList.joinToString { "'$it'" }
-                    searchQuerySqlList.add("b.id in ($billIdListCondition)")
+            val whereList = buildList {
+                // 添加条件
+                queryCondition.isNotCalculate?.let {
+                    this.add("b.isNotCalculate = ${it.toOneOrZero()}")
                 }
-                searchQueryInfo.categoryIdList?.let { searchCategoryIdList ->
-                    val categoryIdListCondition = searchCategoryIdList.joinToString { "'$it'" }
-                    searchQuerySqlList.add("c.id in ($categoryIdListCondition)")
+                queryCondition.isDeleted?.let {
+                    this.add("b.isDeleted = ${it.toOneOrZero()}")
                 }
-                searchQueryInfo.aboutAccountIdList?.let { aboutAccountIdList ->
-                    val aboutAccountIdListCondition = aboutAccountIdList.joinToString { "'$it'" }
-                    searchQuerySqlList.add("b.accountId in ($aboutAccountIdListCondition) or b.transferTargetAccountId in ($aboutAccountIdListCondition)")
-                }
-                if (!searchQueryInfo.noteKey.isNullOrEmpty()) {
-                    val numberKey =
-                        searchQueryInfo.noteKey?.toFloatOrNull()?.times(other = 100)?.toLong()
-                    if (numberKey == null) {
-                        searchQuerySqlList.add("b.note LIKE '%${searchQueryInfo.noteKey}%'")
-                    } else {
-                        searchQuerySqlList.add("b.note LIKE '%${searchQueryInfo.noteKey}%' or b.amount LIKE '%${numberKey}%'")
+                queryCondition.searchQueryInfo?.let { searchQueryInfo ->
+                    val searchQuerySqlList = mutableListOf<String>()
+                    searchQueryInfo.billIdList?.let { searchBillIdList ->
+                        val billIdListCondition = searchBillIdList.joinToString { "'$it'" }
+                        searchQuerySqlList.add("b.id in ($billIdListCondition)")
+                    }
+                    searchQueryInfo.categoryIdList?.let { searchCategoryIdList ->
+                        val categoryIdListCondition = searchCategoryIdList.joinToString { "'$it'" }
+                        searchQuerySqlList.add("c.id in ($categoryIdListCondition)")
+                    }
+                    searchQueryInfo.aboutAccountIdList?.let { aboutAccountIdList ->
+                        val aboutAccountIdListCondition = aboutAccountIdList.joinToString { "'$it'" }
+                        searchQuerySqlList.add("b.accountId in ($aboutAccountIdListCondition) or b.transferTargetAccountId in ($aboutAccountIdListCondition)")
+                    }
+                    if (!searchQueryInfo.noteKey.isNullOrEmpty()) {
+                        val numberKey =
+                            searchQueryInfo.noteKey?.toFloatOrNull()?.times(other = 100)?.toLong()
+                        if (numberKey == null) {
+                            searchQuerySqlList.add("b.note LIKE '%${searchQueryInfo.noteKey}%'")
+                        } else {
+                            searchQuerySqlList.add("b.note LIKE '%${searchQueryInfo.noteKey}%' or b.amount LIKE '%${numberKey}%'")
+                        }
+                    }
+                    if (searchQuerySqlList.isNotEmpty()) {
+                        this.add(
+                            element = "(${
+                                searchQuerySqlList.joinToString(separator = " or ")
+                            })"
+                        )
                     }
                 }
-                if (searchQuerySqlList.isNotEmpty()) {
-                    sb.append(" and (")
-                    sb.append(
-                        searchQuerySqlList.joinToString(separator = " or ")
+                if (queryCondition.idList.isNotEmpty()) {
+                    if (queryCondition.idList.size == 1) {
+                        this.add("b.id = '${queryCondition.idList.first()}'")
+                    } else {
+                        val idListCondition = queryCondition.idList.joinToString { "'$it'" }
+                        this.add("b.id in ($idListCondition)")
+                    }
+                }
+                if (queryCondition.typeList.isNotEmpty()) {
+                    if (queryCondition.typeList.size == 1) {
+                        this.add("b.type = '${queryCondition.typeList.first().value}'")
+                    } else {
+                        val typeListCondition = queryCondition.typeList.joinToString { "'${it.value}'" }
+                        this.add("b.type in ($typeListCondition)")
+                    }
+                }
+                if (queryCondition.userIdList.isNotEmpty()) {
+                    if (queryCondition.userIdList.size == 1) {
+                        this.add("b.userId = '${queryCondition.userIdList.first()}'")
+                    } else {
+                        val userIdListCondition = queryCondition.userIdList.joinToString { "'$it'" }
+                        this.add("b.userId in ($userIdListCondition)")
+                    }
+                }
+                if (queryCondition.bookIdList.isNotEmpty()) {
+                    if (queryCondition.bookIdList.size == 1) {
+                        this.add("b.bookId = '${queryCondition.bookIdList.first()}'")
+                    } else {
+                        val bookIdIdListCondition = queryCondition.bookIdList.joinToString { "'$it'" }
+                        this.add("b.bookId in ($bookIdIdListCondition)")
+                    }
+                }
+                if (queryCondition.categoryIdList.isNotEmpty()) {
+                    if (queryCondition.categoryIdList.size == 1) {
+                        this.add("b.categoryId = '${queryCondition.categoryIdList.first()}'")
+                    } else {
+                        val categoryIdListCondition =
+                            queryCondition.categoryIdList.joinToString { "'$it'" }
+                        this.add("b.categoryId in ($categoryIdListCondition)")
+                    }
+                }
+                if (queryCondition.accountIdList.isNotEmpty()) {
+                    if (queryCondition.accountIdList.size == 1) {
+                        this.add("b.accountId = '${queryCondition.accountIdList.first()}'")
+                    } else {
+                        val accountIdListCondition =
+                            queryCondition.accountIdList.joinToString { "'$it'" }
+                        this.add("b.accountId in ($accountIdListCondition)")
+                    }
+                }
+                if (queryCondition.transferTargetAccountIdList.isNotEmpty()) {
+                    if (queryCondition.transferTargetAccountIdList.size == 1) {
+                        this.add("b.transferTargetAccountId = '${queryCondition.transferTargetAccountIdList.first()}'")
+                    } else {
+                        val transferTargetAccountIdListCondition =
+                            queryCondition.transferTargetAccountIdList.joinToString { "'$it'" }
+                        this.add("b.transferTargetAccountId in ($transferTargetAccountIdListCondition)")
+                    }
+                }
+                if (queryCondition.originBillIdList.isNotEmpty()) {
+                    if (queryCondition.originBillIdList.size == 1) {
+                        this.add("b.originBillId = '${queryCondition.originBillIdList.first()}'")
+                    } else {
+                        val originBillIdListCondition =
+                            queryCondition.originBillIdList.joinToString { "'$it'" }
+                        this.add("b.originBillId in ($originBillIdListCondition)")
+                    }
+                }
+                if (queryCondition.aboutAccountIdList.isNotEmpty()) {
+                    if (queryCondition.aboutAccountIdList.size == 1) {
+                        val aboutAccountId = queryCondition.aboutAccountIdList.first()
+                        this.add("(b.accountId = '${aboutAccountId}' or b.transferTargetAccountId ='${aboutAccountId}')")
+                    } else {
+                        val aboutAccountIdListCondition =
+                            queryCondition.aboutAccountIdList.joinToString { "'$it'" }
+                        this.add("(b.accountId in ($aboutAccountIdListCondition) or b.transferTargetAccountId in ($aboutAccountIdListCondition))")
+                    }
+                }
+                queryCondition.startTimeInclude?.let {
+                    this.add("b.time >= $it")
+                }
+                queryCondition.endTimeInclude?.let {
+                    this.add("b.time <= $it")
+                }
+                if (queryCondition.amountMoreThanZero == true) {
+                    this.add("b.amount > 0")
+                }
+                if (queryCondition.amountLessThanZero == true) {
+                    this.add("b.amount < 0")
+                }
+                queryCondition.amountMin?.let {
+                    this.add("abs(b.amount) >= $it")
+                }
+                queryCondition.amountMax?.let {
+                    this.add("abs(b.amount) <= $it")
+                }
+            }
+
+            if (whereList.isNotEmpty()) {
+                sb.append(" where ${
+                    whereList.joinToString(
+                        separator = " and ",
                     )
-                    sb.append(")")
-                }
+                }")
             }
-            if (queryCondition.idList.isNotEmpty()) {
-                if (queryCondition.idList.size == 1) {
-                    sb.append(" and b.id = '${queryCondition.idList.first()}'")
-                } else {
-                    val idListCondition = queryCondition.idList.joinToString { "'$it'" }
-                    sb.append(" and b.id in ($idListCondition)")
-                }
-            }
-            if (queryCondition.typeList.isNotEmpty()) {
-                if (queryCondition.typeList.size == 1) {
-                    sb.append(" and b.type = '${queryCondition.typeList.first().value}'")
-                } else {
-                    val typeListCondition = queryCondition.typeList.joinToString { "'${it.value}'" }
-                    sb.append(" and b.type in ($typeListCondition)")
-                }
-            }
-            if (queryCondition.userIdList.isNotEmpty()) {
-                if (queryCondition.userIdList.size == 1) {
-                    sb.append(" and b.userId = '${queryCondition.userIdList.first()}'")
-                } else {
-                    val userIdListCondition = queryCondition.userIdList.joinToString { "'$it'" }
-                    sb.append(" and b.userId in ($userIdListCondition)")
-                }
-            }
-            if (queryCondition.bookIdList.isNotEmpty()) {
-                if (queryCondition.bookIdList.size == 1) {
-                    sb.append(" and b.bookId = '${queryCondition.bookIdList.first()}'")
-                } else {
-                    val bookIdIdListCondition = queryCondition.bookIdList.joinToString { "'$it'" }
-                    sb.append(" and b.bookId in ($bookIdIdListCondition)")
-                }
-            }
-            if (queryCondition.categoryIdList.isNotEmpty()) {
-                if (queryCondition.categoryIdList.size == 1) {
-                    sb.append(" and b.categoryId = '${queryCondition.categoryIdList.first()}'")
-                } else {
-                    val categoryIdListCondition =
-                        queryCondition.categoryIdList.joinToString { "'$it'" }
-                    sb.append(" and b.categoryId in ($categoryIdListCondition)")
-                }
-            }
-            if (queryCondition.accountIdList.isNotEmpty()) {
-                if (queryCondition.accountIdList.size == 1) {
-                    sb.append(" and b.accountId = '${queryCondition.accountIdList.first()}'")
-                } else {
-                    val accountIdListCondition =
-                        queryCondition.accountIdList.joinToString { "'$it'" }
-                    sb.append(" and b.accountId in ($accountIdListCondition)")
-                }
-            }
-            if (queryCondition.transferTargetAccountIdList.isNotEmpty()) {
-                if (queryCondition.transferTargetAccountIdList.size == 1) {
-                    sb.append(" and b.transferTargetAccountId = '${queryCondition.transferTargetAccountIdList.first()}'")
-                } else {
-                    val transferTargetAccountIdListCondition =
-                        queryCondition.transferTargetAccountIdList.joinToString { "'$it'" }
-                    sb.append(" and b.transferTargetAccountId in ($transferTargetAccountIdListCondition)")
-                }
-            }
-            if (queryCondition.originBillIdList.isNotEmpty()) {
-                if (queryCondition.originBillIdList.size == 1) {
-                    sb.append(" and b.originBillId = '${queryCondition.originBillIdList.first()}'")
-                } else {
-                    val originBillIdListCondition =
-                        queryCondition.originBillIdList.joinToString { "'$it'" }
-                    sb.append(" and b.originBillId in ($originBillIdListCondition)")
-                }
-            }
-            if (queryCondition.aboutAccountIdList.isNotEmpty()) {
-                if (queryCondition.aboutAccountIdList.size == 1) {
-                    val aboutAccountId = queryCondition.aboutAccountIdList.first()
-                    sb.append(" and (b.accountId = '${aboutAccountId}' or b.transferTargetAccountId ='${aboutAccountId}')")
-                } else {
-                    val aboutAccountIdListCondition =
-                        queryCondition.aboutAccountIdList.joinToString { "'$it'" }
-                    sb.append(" and (b.accountId in ($aboutAccountIdListCondition) or b.transferTargetAccountId in ($aboutAccountIdListCondition))")
-                }
-            }
-            queryCondition.startTimeInclude?.let {
-                sb.append(" and b.time >= $it")
-            }
-            queryCondition.endTimeInclude?.let {
-                sb.append(" and b.time <= $it")
-            }
-            if (queryCondition.amountMoreThanZero == true) {
-                sb.append(" and b.amount > 0")
-            }
-            if (queryCondition.amountLessThanZero == true) {
-                sb.append(" and b.amount < 0")
-            }
-            queryCondition.amountMin?.let {
-                sb.append(" and abs(b.amount) >= $it")
-            }
-            queryCondition.amountMax?.let {
-                sb.append(" and abs(b.amount) <= $it")
-            }
+
+            // 条件结束了
+
             when (queryType) {
 
                 BillDetailPageQueryType.DayTime -> {

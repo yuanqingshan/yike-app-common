@@ -39,17 +39,11 @@ class BookInfoViewModel(
                 bookName = item.name?.toStringItemDto(),
                 totalSpending = AppServices.tallyDataSourceSpi.getBillAmountByCondition(
                     queryCondition = queryCondition.copy(
-                        typeList = listOf(
-                            TallyBillDto.Type.NORMAL,
-                        ),
                         amountLessThanZero = true,
                     ),
                 ).toYuan(),
                 totalIncome = AppServices.tallyDataSourceSpi.getBillAmountByCondition(
                     queryCondition = queryCondition.copy(
-                        typeList = listOf(
-                            TallyBillDto.Type.NORMAL,
-                        ),
                         amountMoreThanZero = true,
                     ),
                 ).toYuan(),

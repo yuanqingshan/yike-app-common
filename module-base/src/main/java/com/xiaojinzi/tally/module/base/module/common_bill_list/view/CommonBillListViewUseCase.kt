@@ -55,13 +55,23 @@ class CommonBillListViewUseCaseImpl(
                     val dayIncomeCost = entity
                         .value
                         .asSequence()
-                        .filter { it.core.type == TallyBillDto.Type.NORMAL && it.core.amount.value > 0f }
+                        .filter {
+                            (it.core.type == TallyBillDto.Type.NORMAL ||
+                                    it.core.type == TallyBillDto.Type.REFUND) &&
+                                    !it.core.isNotCalculate &&
+                                    it.core.amount.value > 0f
+                        }
                         .map { it.core.amount }
                         .reduceOrNull { acc, value -> acc + value } ?: MoneyFen(value = 0)
                     val daySpendingCost = entity
                         .value
                         .asSequence()
-                        .filter { it.core.type == TallyBillDto.Type.NORMAL && it.core.amount.value < 0f }
+                        .filter {
+                            (it.core.type == TallyBillDto.Type.NORMAL ||
+                                    it.core.type == TallyBillDto.Type.REFUND) &&
+                                    !it.core.isNotCalculate &&
+                                    it.core.amount.value < 0f
+                        }
                         .map { it.core.amount }
                         .reduceOrNull { acc, value -> acc + value } ?: MoneyFen(value = 0)
                     val billDetailList = entity.value

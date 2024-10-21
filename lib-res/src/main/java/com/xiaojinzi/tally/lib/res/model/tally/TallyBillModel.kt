@@ -91,7 +91,13 @@ data class TallyBillDto(
     val amount: MoneyFen,
     // 备注
     val note: String?,
-    // 不计入收支o
+    /**
+     * 不计入收支
+     * 含义是统计的各个地方都要忽略
+     * 不提现在各个统计的地方, 比如当月支出和收入. 但是在账单列表中是要显示的
+     * 账本统计也不能参与其中.
+     * 但是账户的钱是要变化的. 因为不参与统计但是确实真实的支出或者收入了
+     */
     val isNotCalculate: Boolean,
     val timeCreate: Long,
     val timeModify: Long?,
@@ -104,7 +110,8 @@ data class TallyBillDto(
      */
     enum class Type(
         val value: String,
-    ) {
+    ) // 占位
+    {
         Unknown(
             value = "",
         ),
