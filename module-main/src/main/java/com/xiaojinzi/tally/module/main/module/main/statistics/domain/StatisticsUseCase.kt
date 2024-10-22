@@ -28,6 +28,7 @@ import com.xiaojinzi.tally.lib.res.model.support.LocalImageItemDto
 import com.xiaojinzi.tally.lib.res.model.support.toLocalImageItemDto
 import com.xiaojinzi.tally.lib.res.model.tally.MoneyFen
 import com.xiaojinzi.tally.lib.res.model.tally.MoneyYuan
+import com.xiaojinzi.tally.lib.res.model.tally.TallyBillDto
 import com.xiaojinzi.tally.lib.res.model.tally.TallyTable
 import com.xiaojinzi.tally.module.base.spi.TallyDataSourceSpi
 import com.xiaojinzi.tally.module.base.support.AppRouterCoreApi
@@ -299,6 +300,10 @@ class StatisticsUseCaseImpl(
                     .tallyDataSourceSpi
                     .getBillAmountByCondition(
                         queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
+                            typeList = listOf(
+                                TallyBillDto.Type.NORMAL,
+                                TallyBillDto.Type.REFUND,
+                            ),
                             bookIdList = listOf(
                                 currentBookInfo.id,
                             ),
@@ -423,6 +428,10 @@ class StatisticsUseCaseImpl(
                             .tallyDataSourceSpi
                             .getBillAmountByCondition(
                                 queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
+                                    typeList = listOf(
+                                        TallyBillDto.Type.NORMAL,
+                                        TallyBillDto.Type.REFUND,
+                                    ),
                                     bookIdList = listOf(selectedBook.id),
                                     startTimeInclude = timeRange.first,
                                     endTimeInclude = timeRange.second,

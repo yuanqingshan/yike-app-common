@@ -265,6 +265,11 @@ interface BillCrudUseCase : BusinessUseCase {
      */
     val canSwitchBookState: HotStateFlow<Boolean>
 
+    /**
+     * 是否显示不计入视图
+     */
+    val isShowNotCalculateViewState: HotStateFlow<Boolean>
+
 }
 
 @ViewModelLayer
@@ -423,6 +428,11 @@ class BillCrudUseCaseImpl(
     ) { isEdit, refundBill ->
         !isEdit && refundBill == null
     }
+
+    override val isShowNotCalculateViewState = tabStateOb
+        .map {
+            it == BillCrudTab.Spending || it == BillCrudTab.Income
+        }
 
     private suspend fun getDefAccount(
         bookId: String?,
@@ -965,7 +975,10 @@ class BillCrudUseCaseImpl(
                 1
             },
         )
-        val isNotCalculate = isNotCalculateState.first()
+        val isNotCalculateFinal = when (currentTab) {
+            BillCrudTab.Spending, BillCrudTab.Income -> isNotCalculateState.first()
+            BillCrudTab.Transfer -> false
+        }
         if (editBillDetailInfo == null) {
             // 插入一个账单
             AppServices
@@ -982,7 +995,7 @@ class BillCrudUseCaseImpl(
                         note = note,
                         time = targetTime,
                         amount = amountFinal,
-                        isNotCalculate = isNotCalculate,
+                        isNotCalculate = isNotCalculateFinal,
                     ),
                     labelIdList = targetLabelIdList,
                     imageUrlList = targetImageUrlList,
@@ -1005,7 +1018,7 @@ class BillCrudUseCaseImpl(
                                 note = note,
                                 time = targetTime,
                                 amount = amountFinal,
-                                isNotCalculate = isNotCalculate,
+                                isNotCalculate = isNotCalculateFinal,
                             ),
                             labelIdList = targetLabelIdList,
                             imageUrlList = targetImageUrlList,

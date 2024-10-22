@@ -431,9 +431,11 @@ private fun BillCrudCoreView(
     val transferTargetAccount by vm.transferTargetAccountStateOb.collectAsState(initial = null)
     val imageUrlList by vm.imageUrlListState.collectAsState(initial = emptyList())
     val isNotCalculate by vm.isNotCalculateState.collectAsState(initial = false)
+    val isShowNotCalculateView by vm.isShowNotCalculateViewState.collectAsState(initial = false)
 
     val subSpendingCategoryList = categorySpendingMap[categoryGroupSelected]
     val subIncomeCategoryList = categoryIncomeMap[categoryGroupSelected]
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -1290,37 +1292,39 @@ private fun BillCrudCoreView(
                         }
                     }
 
-                    // 不计入预算
-                    Row(
-                        modifier = Modifier
-                            .offset(x = (-4).dp)
-                            .wrapContentSize()
-                            .clickableNoRipple {
-                                vm.isNotCalculateState.tryToggle()
-                            }
-                            .nothing(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Checkbox(
+                    AnimatedVisibility(visible = isShowNotCalculateView) {
+                        // 不计入预算
+                        Row(
                             modifier = Modifier
+                                .offset(x = (-4).dp)
                                 .wrapContentSize()
-                                .scale(0.8f)
+                                .clickableNoRipple {
+                                    vm.isNotCalculateState.tryToggle()
+                                }
                                 .nothing(),
-                            checked = isNotCalculate,
-                            onCheckedChange = {
-                                vm.isNotCalculateState.tryToggle()
-                            },
-                        )
-                        Text(
-                            modifier = Modifier
-                                .offset(x = (-8).dp)
-                                .wrapContentSize()
-                                .nothing(),
-                            text = "不计入收支",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                            ),
-                        )
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Checkbox(
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .scale(0.8f)
+                                    .nothing(),
+                                checked = isNotCalculate,
+                                onCheckedChange = {
+                                    vm.isNotCalculateState.tryToggle()
+                                },
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .offset(x = (-8).dp)
+                                    .wrapContentSize()
+                                    .nothing(),
+                                text = "不计入收支",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                ),
+                            )
+                        }
                     }
 
                 }
