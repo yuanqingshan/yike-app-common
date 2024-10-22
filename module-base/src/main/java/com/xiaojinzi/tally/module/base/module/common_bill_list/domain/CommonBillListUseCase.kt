@@ -158,6 +158,7 @@ class CommonBillListUseCaseImpl(
                             .map {
                                 val dayTimeList = tallyDataSourceSpi.getBillDayTimeListByCondition(
                                     queryCondition = queryCondition.copy(
+                                        typeList = emptyList(),
                                         pageInfo = TallyDataSourceSpi.Companion.PageInfo(
                                             pageStartIndex = 0,
                                             pageSize = page * 10,

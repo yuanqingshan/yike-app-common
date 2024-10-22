@@ -132,6 +132,10 @@ class LabelInfoUseCaseImpl(
                             } else {
                                 AppServices.tallyDataSourceSpi.getBillAmountByCondition(
                                     queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
+                                        typeList = listOf(
+                                            TallyBillDto.Type.NORMAL,
+                                            TallyBillDto.Type.REFUND,
+                                        ),
                                         idList = billIdList,
                                     ),
                                 ).toYuan()

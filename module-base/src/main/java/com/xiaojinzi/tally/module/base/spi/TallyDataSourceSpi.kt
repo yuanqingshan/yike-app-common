@@ -68,11 +68,11 @@ interface TallyDataSourceSpi {
             val businessLogKey: String? = null,
             // 一般是一些多对多的时候用的, 比如要显示某个标签下的账单
             val idList: List<String> = emptyList(),
-            // 默认查询支持统计的账单类别
-            val typeList: List<TallyBillDto.Type> = listOf(
-                TallyBillDto.Type.NORMAL,
-                TallyBillDto.Type.REFUND,
-            ),
+            /**
+             * 查询的账单类别
+             * 默认是查询普通和退款的
+             */
+            val typeList: List<TallyBillDto.Type> = emptyList(),
             val userIdList: List<String> = emptyList(),
             val bookIdList: List<String> = emptyList(),
             val categoryIdList: List<String> = emptyList(),

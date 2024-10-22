@@ -32,7 +32,6 @@ class BookInfoViewModel(
         bookList.map { item ->
             val queryCondition = TallyDataSourceSpi.Companion.BillQueryConditionDto(
                 bookIdList = listOf(item.id),
-                isNotCalculate = false,
             )
             BookInfoItemVo(
                 bookId = item.id,
@@ -41,11 +40,13 @@ class BookInfoViewModel(
                 totalSpending = AppServices.tallyDataSourceSpi.getBillAmountByCondition(
                     queryCondition = queryCondition.copy(
                         amountLessThanZero = true,
+                        isNotCalculate = false,
                     ),
                 ).toYuan(),
                 totalIncome = AppServices.tallyDataSourceSpi.getBillAmountByCondition(
                     queryCondition = queryCondition.copy(
                         amountMoreThanZero = true,
+                        isNotCalculate = false,
                     ),
                 ).toYuan(),
                 billCount = AppServices.tallyDataSourceSpi.getBillCountByCondition(

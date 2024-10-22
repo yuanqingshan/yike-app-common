@@ -434,6 +434,7 @@ class StatisticsUseCaseImpl(
                                         StatisticsUseCase.StatisticsType.Spending -> true
                                         else -> null
                                     },
+                                    isNotCalculate = false,
                                 ),
                             ).transform { it.absoluteValue }
                     )

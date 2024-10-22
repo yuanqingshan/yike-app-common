@@ -1123,6 +1123,7 @@ private fun BillCrudCoreView(
                 )
                 Row(
                     modifier = Modifier
+                        .horizontalScroll(state = rememberScrollState())
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .padding(horizontal = APP_PADDING_NORMAL.dp, vertical = 0.dp)
