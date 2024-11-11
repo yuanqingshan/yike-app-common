@@ -16,6 +16,9 @@ class AppPlugin : Plugin<Project> {
                 if (this.findPlugin("com.xiaojinzi.kcomponent.plugin") == null) {
                     apply("com.xiaojinzi.kcomponent.plugin")
                 }
+                if (this.findPlugin("org.jetbrains.kotlin.plugin.compose") == null) {
+                    apply("org.jetbrains.kotlin.plugin.compose")
+                }
             }
         }
         BasicConfigPlugin().apply(project = project)

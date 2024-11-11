@@ -149,9 +149,12 @@ abstract class BaseAppInfoSpiImpl : AppInfoSpi {
 
     final override val appVersionName: String
         get() = try {
-            app
-                .packageManager
-                .getPackageInfo(app.packageName, 0).versionName
+            checkNotNull(
+                app
+                    .packageManager
+                    .getPackageInfo(app.packageName, 0)
+                    .versionName
+            )
         } catch (e: Exception) {
             "UnKnow"
         }

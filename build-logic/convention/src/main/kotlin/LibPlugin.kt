@@ -20,6 +20,9 @@ class LibPlugin : Plugin<Project> {
                 if (this.findPlugin("org.jetbrains.kotlin.android") == null) {
                     apply("org.jetbrains.kotlin.android")
                 }
+                if (this.findPlugin("org.jetbrains.kotlin.plugin.compose") == null) {
+                    apply("org.jetbrains.kotlin.plugin.compose")
+                }
             }
             extensions.configure<LibraryExtension> {
                 defaultConfig {
