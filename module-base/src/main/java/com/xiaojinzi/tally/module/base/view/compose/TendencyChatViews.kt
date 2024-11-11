@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +33,8 @@ data class TendencyChatItemVo(
     val timeStr: String? = null,
     // 金额
     val amount: MoneyYuan,
-    // 1 表示这个 item 的数据是最大的, 会填满视图的高度
+    // 0 表示这个 item 的数据是最小的, 会在最下面
+    // 1 表示这个 item 的数据是最大的, 会在最上面
     @FloatRange(from = 0.0, to = 1.0)
     val percent: Float,
 )
